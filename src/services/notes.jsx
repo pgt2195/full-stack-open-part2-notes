@@ -1,5 +1,5 @@
 import axios from 'axios'
-// const baseUrl = 'http://192.168.1.31:3002/api/notes'
+// const baseUrl = 'http://192.168.1.34:3004/api/notes'
 const baseUrl = '/api/notes'
 
 const getAll = () => {
