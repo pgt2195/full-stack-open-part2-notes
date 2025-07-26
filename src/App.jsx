@@ -6,6 +6,7 @@ import LoginForm from './components/LoginForm'
 import NoteForm from './components/NoteForm'
 import noteService from './services/notes'
 import loginService from './services/login'
+// import { log } from 'console'
 
 const App = () => {
   const [notes, setNotes] = useState([])
@@ -15,6 +16,7 @@ const App = () => {
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('') 
   const [user, setUser] = useState(null)
+  const [loginVisible, setLoginVisible] = useState(false)
 
   useEffect(() => {
     noteService
@@ -108,9 +110,12 @@ const App = () => {
             formData={{username, password}} 
             handleLogin={handleLogin}
             onChange={{setUsername, setPassword}}
+            loginVisible={loginVisible}
+            setLoginVisible={setLoginVisible}
           />  
         : <NoteForm
             user={user}
+            setUser={setUser}
             handleNoteChange={handleNoteChange}
             addNote={addNote}
             newNote={newNote}
