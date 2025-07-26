@@ -1,16 +1,42 @@
-const logout = (setUser) => {
-    window.localStorage.removeItem('loggedNoteappUser')
-    setUser(null)
-}
+import noteService from '../services/notes'
+import { useState } from 'react'
 
-const NoteForm = ({ user, setUser, handleNoteChange, addNote, newNote}) => (
+const NoteForm = ({ notes, setNotes, setErrorMessage }) => {
+  const [newNote, setNewNote] = useState('')
+
+  const handleNoteChange = (event) => {
+    setNewNote(event.target.value)
+  }
+
+  const addNote = (event) => {
+    event.preventDefault()
+    const noteObject = {
+      content: newNote,
+      important: Math.random() > 0.5,
+    }
+
+    noteService
+      .create(noteObject)
+        .then(returnedNote => {
+        setNotes(notes.concat(returnedNote))
+        setNewNote('')
+      })
+        .catch ((exception) => {
+          setErrorMessage(`Oops, something went wrong : ${exception}`)
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000)
+        })
+  }
+
+  return (
     <div>
-        <p>{user.name} is logged in <button onClick={() => logout(setUser)}>logout</button></p>
-        <form onSubmit={addNote}>
-            <input value={newNote} onChange={handleNoteChange} />
-            <button type="submit">save</button>
-        </form>  
+      <form onSubmit={addNote}>
+        <input value={newNote} onChange={handleNoteChange} />
+        <button type="submit">save</button>
+      </form>
     </div>
-  )
+  );
+};
 
-export default NoteForm
+export default NoteForm;

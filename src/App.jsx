@@ -6,17 +6,14 @@ import LoginForm from './components/LoginForm'
 import NoteForm from './components/NoteForm'
 import noteService from './services/notes'
 import loginService from './services/login'
-// import { log } from 'console'
+import Togglable from './components/Toggable'
+import { logout } from './services/utils'
 
 const App = () => {
   const [notes, setNotes] = useState([])
-  const [newNote, setNewNote] = useState('')
   const [showAll, setShowAll] = useState(true)
   const [errorMessage, setErrorMessage] = useState(null)
-  const [username, setUsername] = useState('') 
-  const [password, setPassword] = useState('') 
   const [user, setUser] = useState(null)
-  const [loginVisible, setLoginVisible] = useState(false)
 
   useEffect(() => {
     noteService
@@ -34,25 +31,6 @@ const App = () => {
       noteService.setToken(user.token)
     }
   }, [])
-
-  const addNote = (event) => {
-    event.preventDefault()
-    const noteObject = {
-      content: newNote,
-      important: Math.random() > 0.5,
-    }
-
-    noteService
-      .create(noteObject)
-        .then(returnedNote => {
-        setNotes(notes.concat(returnedNote))
-        setNewNote('')
-      })
-  }
-
-  const handleNoteChange = (event) => {
-    setNewNote(event.target.value)
-  }
 
   const notesToShow = showAll
     ? notes
@@ -76,29 +54,6 @@ const App = () => {
         setNotes(notes.filter(n => n.id !== id))
       })
   }
-
-  const handleLogin = async (event) => {
-    event.preventDefault()
-    
-    try {
-      const user = await loginService.login({
-        username, password,
-      })
-
-      window.localStorage.setItem(
-        'loggedNoteappUser', JSON.stringify(user)
-      ) 
-      noteService.setToken(user.token)
-      setUser(user)
-      setUsername('')
-      setPassword('')
-    } catch (exception) {
-      setErrorMessage('Wrong credentials')
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
-    }
-  }
   
   return (
     <div>
@@ -106,20 +61,22 @@ const App = () => {
       <Notification message={errorMessage} />
 
       {user === null 
-        ? <LoginForm 
-            formData={{username, password}} 
-            handleLogin={handleLogin}
-            onChange={{setUsername, setPassword}}
-            loginVisible={loginVisible}
-            setLoginVisible={setLoginVisible}
-          />  
-        : <NoteForm
-            user={user}
-            setUser={setUser}
-            handleNoteChange={handleNoteChange}
-            addNote={addNote}
-            newNote={newNote}
-          />
+        ? <Togglable buttonLabel='login'>
+            <LoginForm 
+              setUser={setUser}
+              setErrorMessage={setErrorMessage}
+            />
+          </Togglable>
+        : <>
+            <p>{user.name} is logged in <button onClick={() => logout(setUser)}>logout</button></p>
+            <Togglable buttonLabel='add new note'>
+              <NoteForm 
+                notes={notes}
+                setNotes={setNotes}
+                setErrorMessage={setErrorMessage}
+              />
+            </Togglable>
+          </>
       }
 
       <div>—————————————</div>

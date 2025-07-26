@@ -1,29 +1,57 @@
-const LoginForm = ({ formData, handleLogin, onChange, loginVisible, setLoginVisible }) => (
-  <>
-    {loginVisible 
-      ? <form onSubmit={handleLogin}>
-          <div>
-            username <input
-              type="text"
-              value={formData.username}
-              name="Username"
-              onChange={({ target }) => onChange.setUsername(target.value)}
-            />
-          </div>
-          <div>
-            password <input
-              type="password"
-              value={formData.password}
-              name="Password"
-              onChange={({ target }) => onChange.setPassword(target.value)}
-            />
-          </div>
-          <button type="submit">login</button>
-          <button type="button" onClick={() => setLoginVisible(false)}>cancel</button>
-        </form>
-      : <button onClick={() => setLoginVisible(true)}>log in</button>
-    }
-  </>    
-)
+import {useState} from 'react'
+import noteService from '../services/notes'
+import loginService from '../services/login'
 
-export default LoginForm
+const LoginForm = ({ setUser, setErrorMessage }) => {
+  const [username, setUsername] = useState('') 
+  const [password, setPassword] = useState('') 
+
+  const handleLogin = async (event) => {
+    event.preventDefault()
+    
+    try {
+      const user = await loginService.login({
+        username, password,
+      })
+
+      window.localStorage.setItem(
+        'loggedNoteappUser', JSON.stringify(user)
+      ) 
+      noteService.setToken(user.token)
+      setUser(user)
+      setUsername('')
+      setPassword('')
+    } catch (exception) {
+      setErrorMessage('Wrong credentials')
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }
+  }
+
+  return (
+    <form onSubmit={handleLogin}>
+      <div>
+        username{" "}
+        <input
+          type="text"
+          value={username}
+          name="Username"
+          onChange={({ target }) => setUsername(target.value)}
+        />
+      </div>
+      <div>
+        password{" "}
+        <input
+          type="password"
+          value={password}
+          name="Password"
+          onChange={({ target }) => setPassword(target.value)}
+        />
+      </div>
+      <button type="submit">login</button>
+    </form>
+  );
+};
+
+export default LoginForm;
