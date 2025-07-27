@@ -1,7 +1,7 @@
 import noteService from '../services/notes'
 import { useState } from 'react'
 
-const NoteForm = ({ notes, setNotes, setErrorMessage }) => {
+const NoteForm = ({ notes, setNotes, setErrorMessage, noteFormRef }) => {
   const [newNote, setNewNote] = useState('')
 
   const handleNoteChange = (event) => {
@@ -15,6 +15,8 @@ const NoteForm = ({ notes, setNotes, setErrorMessage }) => {
       important: Math.random() > 0.5,
     }
 
+    noteFormRef.current.toggleVisibility()
+    
     noteService
       .create(noteObject)
         .then(returnedNote => {

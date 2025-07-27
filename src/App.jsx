@@ -1,11 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Note from './components/Note'
 import Notification from './components/Notification'
 import Footer from './components/Footer'
 import LoginForm from './components/LoginForm'
 import NoteForm from './components/NoteForm'
 import noteService from './services/notes'
-import loginService from './services/login'
 import Togglable from './components/Toggable'
 import { logout } from './services/utils'
 
@@ -14,6 +13,8 @@ const App = () => {
   const [showAll, setShowAll] = useState(true)
   const [errorMessage, setErrorMessage] = useState(null)
   const [user, setUser] = useState(null)
+
+  const noteFormRef = useRef()
 
   useEffect(() => {
     noteService
@@ -44,7 +45,7 @@ const App = () => {
       .update(id, changedNote).then(returnedNote => {
         setNotes(notes.map(note => note.id !== id ? note : returnedNote))
       })
-      .catch(error => {
+      .catch(_error => {
         setErrorMessage(
           `Note '${note.content}' was already removed from server`
         )
@@ -69,11 +70,12 @@ const App = () => {
           </Togglable>
         : <>
             <p>{user.name} is logged in <button onClick={() => logout(setUser)}>logout</button></p>
-            <Togglable buttonLabel='add new note'>
+            <Togglable buttonLabel='add new note' ref={noteFormRef}>
               <NoteForm 
                 notes={notes}
                 setNotes={setNotes}
                 setErrorMessage={setErrorMessage}
+                noteFormRef={noteFormRef}
               />
             </Togglable>
           </>
