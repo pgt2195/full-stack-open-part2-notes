@@ -5,7 +5,7 @@ import Footer from './components/Footer'
 import LoginForm from './components/LoginForm'
 import NoteForm from './components/NoteForm'
 import noteService from './services/notes'
-import Togglable from './components/Toggable'
+import Togglable from './components/Togglable'
 import { logout } from './services/utils'
 
 const App = () => {
